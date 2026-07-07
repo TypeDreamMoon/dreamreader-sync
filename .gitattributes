@@ -1,0 +1,9 @@
+# Normalize to LF so the CGO-free Linux Docker build and gofmt stay consistent
+# regardless of the checkout OS.
+* text=auto eol=lf
+*.go text eol=lf
+*.mod text eol=lf
+*.sum text eol=lf
+*.md text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf

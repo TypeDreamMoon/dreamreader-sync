@@ -1,0 +1,14 @@
+# Local data + built binaries
+/data/
+*.db
+*.db-wal
+*.db-shm
+/dreamreader-sync
+/dreamreader-sync.exe
+/out/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
