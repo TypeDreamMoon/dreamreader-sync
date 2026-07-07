@@ -210,7 +210,8 @@ fi
 
 # --- nginx ---------------------------------------------------------------------
 if [ "$DO_NGINX" = n ]; then
-  info "Skipping Nginx (panel-managed). Proxy your domain to 127.0.0.1:$PORT."
+  info "Skipping Nginx (panel-managed). Reverse-proxy your domain to 127.0.0.1:$PORT."
+  info "宝塔/aaPanel 步骤见 deploy/install/README.md(注意把 client_max_body_size 提到 12m)。"
   exit 0
 fi
 command -v nginx >/dev/null 2>&1 || die "nginx not installed (or use --no-nginx for panel-managed TLS)"
