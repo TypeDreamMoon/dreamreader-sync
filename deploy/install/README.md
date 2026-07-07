@@ -54,8 +54,16 @@ sudo ./scripts/install.sh --no-nginx
 ## Prerequisites
 
 1. **Docker Engine + compose plugin** on the host.
-2. **The IAM platform is deployed** and reachable at the issuer URL.
-3. **The `dream_manga_reader` client is registered in IAM** as a **public
+2. **Clone this repo next to `hertz-iam`.** The build resolves `authmw-go` from
+   the sibling `hertz-iam` checkout (`replace => ../hertz-iam/packages/authmw-go`),
+   so the two must share a parent — exactly like `hertz-community`:
+   ```
+   <parent>/
+     hertz-iam/           # already there if IAM is deployed on this host
+     dreamreader-sync/    # git clone here
+   ```
+3. **The IAM platform is deployed** and reachable at the issuer URL.
+4. **The `dream_manga_reader` client is registered in IAM** as a **public
    client** with **`authorization_code` + `refresh_token`** grants and **PKCE**,
    and the app's redirect URIs allow-listed:
    - Android: `dreammangareader://auth`
