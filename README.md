@@ -61,18 +61,17 @@ go run ./cmd/dreamreader-sync          # needs a reachable IAM for real tokens
 
 ## Docker
 
-The build needs the sibling `hertz-iam` checkout (for the `authmw-go` replace),
-so build from the **hertz-games parent** directory:
+The build is self-contained (the IAM validator is vendored under
+`internal/authmw`) — no sibling repos, any checkout name works:
 
 ```sh
-cd I:\Web\hertz-games
-docker build -f dreamreader-sync/Dockerfile -t dreamreader-sync .
+docker build -t dreamreader-sync .
 ```
 
 Or via compose (`deploy/dev/docker-compose.yml`):
 
 ```sh
-cd dreamreader-sync/deploy/dev
+cd deploy/dev
 docker compose up --build
 ```
 
@@ -83,6 +82,7 @@ cmd/dreamreader-sync/   entrypoint (config → store → validator → server)
 internal/config/        env-driven configuration
 internal/store/         SQLite store: sync_docs, ETag optimistic concurrency
 internal/httpapi/       routing, IAM auth, CORS, sync handlers, integration test
-Dockerfile              CGO-free static build → alpine
-deploy/dev/             docker compose for local runs
+internal/authmw/        vendored IAM token validator (middleware + jwks)
+Dockerfile              CGO-free, self-contained static build → alpine
+deploy/                 dev + install (interactive) deployment
 ```

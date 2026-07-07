@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hertz-iam/authmw-go/middleware"
+	"github.com/TypeDreamMoon/dreamreader-sync/internal/authmw/middleware"
 
 	"github.com/TypeDreamMoon/dreamreader-sync/internal/store"
 )

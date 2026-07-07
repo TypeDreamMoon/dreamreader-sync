@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/hertz-iam/authmw-go/middleware"
+	"github.com/TypeDreamMoon/dreamreader-sync/internal/authmw/middleware"
 
 	"github.com/TypeDreamMoon/dreamreader-sync/internal/config"
 	"github.com/TypeDreamMoon/dreamreader-sync/internal/store"

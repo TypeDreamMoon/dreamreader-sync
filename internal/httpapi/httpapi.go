@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/hertz-iam/authmw-go/middleware"
+	"github.com/TypeDreamMoon/dreamreader-sync/internal/authmw/middleware"
 
 	"github.com/TypeDreamMoon/dreamreader-sync/internal/config"
 	"github.com/TypeDreamMoon/dreamreader-sync/internal/store"

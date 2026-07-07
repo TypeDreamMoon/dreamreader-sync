@@ -4,7 +4,6 @@ go 1.26
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/hertz-iam/authmw-go v0.0.0
 	modernc.org/sqlite v1.53.0
 )
 
@@ -19,8 +18,3 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
-
-// dreamreader-sync is a standalone, app-owned service. Its only cross-repo
-// coupling is the canonical IAM token validator, resolved from the sibling
-// hertz-iam checkout so it always tracks the platform's JWKS/JWT rules.
-replace github.com/hertz-iam/authmw-go => ../hertz-iam/packages/authmw-go

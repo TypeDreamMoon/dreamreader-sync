@@ -1,17 +1,17 @@
 # Dev compose for dreamreader-sync.
 #
-# Build context is the hertz-games parent so the cross-repo replace (authmw-go)
-# resolves. Point DREAMSYNC_IAM_ISSUER at your running hertz-iam. By default the
-# service reaches the host's IAM via host.docker.internal; to instead join the
-# IAM dev network and reach it by service name, uncomment the networks block.
+# Self-contained build (context = repo root). Point DREAMSYNC_IAM_ISSUER at your
+# running hertz-iam. By default the service reaches the host's IAM via
+# host.docker.internal; to instead join the IAM dev network and reach it by
+# service name, uncomment the networks block.
 #
-#   cd I:\Web\hertz-games\dreamreader-sync\deploy\dev
+#   cd dreamreader-sync/deploy/dev
 #   docker compose up --build
 services:
   dreamreader-sync:
     build:
-      context: ../../..
-      dockerfile: dreamreader-sync/Dockerfile
+      context: ../..
+      dockerfile: Dockerfile
     image: dreamreader-sync:dev
     environment:
       DREAMSYNC_HTTP_ADDR: ":8090"

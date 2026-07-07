@@ -18,10 +18,10 @@ x-logging: &default-logging
 services:
   dreamreader-sync:
     build:
-      # Build context is the hertz-games parent so the cross-repo Go replace
-      # (../hertz-iam/packages/authmw-go) resolves.
-      context: ../../..
-      dockerfile: dreamreader-sync/Dockerfile
+      # Self-contained build: context is the repo root (IAM validator is vendored
+      # under internal/authmw), so no sibling checkout is needed.
+      context: ../..
+      dockerfile: Dockerfile
       network: "${HERTZ_BUILD_NETWORK:-host}"
       args:
         GOPROXY: "${HERTZ_GOPROXY:-https://goproxy.cn,direct}"
