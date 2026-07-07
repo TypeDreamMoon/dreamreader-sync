@@ -1,3 +1,6 @@
+# Generated deploy config (holds host/IAM specifics; keep .env.example tracked)
+/deploy/install/.env
+
 # Local data + built binaries
 /data/
 *.db

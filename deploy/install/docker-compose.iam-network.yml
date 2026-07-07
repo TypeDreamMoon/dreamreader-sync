@@ -1,0 +1,18 @@
+# Optional override: attach dreamreader-sync to the IAM platform's Docker
+# network so it can fetch JWKS from IAM by internal service name
+# (e.g. DREAMSYNC_JWKS_URI=http://iam-api:8080/realms/user/jwks) instead of over
+# the public internet. Layered when DREAMSYNC_USE_IAM_NET=y.
+name: dreamreader-sync
+
+networks:
+  iam:
+    # The IAM stack's network — check `docker network ls` (default fits an IAM
+    # installed as the "hertz-iam" compose project).
+    name: ${HERTZ_IAM_NETWORK:-hertz-iam_default}
+    external: true
+
+services:
+  dreamreader-sync:
+    networks:
+      - default
+      - iam

@@ -1,0 +1,24 @@
+# dreamreader-sync host-nginx site, rendered by scripts/install.sh.
+# TLS: run `certbot --nginx -d __DOMAIN__` after DNS points at this host, or let
+# aaPanel/BT manage TLS when installing with --no-nginx.
+#
+# The whole domain proxies to the sync service on 127.0.0.1:__SYNC_PORT__. The
+# app talks to it directly (Bearer IAM token); there is no separate web tier.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __DOMAIN__;
+
+    # A sync document is capped at 8 MiB server-side; allow headroom for it.
+    client_max_body_size 12m;
+
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+
+    location / {
+        proxy_pass http://127.0.0.1:__SYNC_PORT__;
+    }
+}

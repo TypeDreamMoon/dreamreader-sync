@@ -1,0 +1,64 @@
+# dreamreader-sync production stack for Debian hosts with host Nginx.
+#
+# One service: a Go + SQLite blob-sync backend for the Dream Manga Reader app.
+# It binds to 127.0.0.1; Nginx terminates HTTP(S) and proxies the public domain
+# to it. Identity comes from the IAM platform (../../../hertz-iam) — this service
+# only validates IAM access tokens via JWKS and never runs its own IdP.
+#
+# Prereq: the `dream_manga_reader` client is registered in IAM as a public client
+# (authorization_code + refresh_token + PKCE) with the app's redirect URIs.
+name: dreamreader-sync
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  dreamreader-sync:
+    build:
+      # Build context is the hertz-games parent so the cross-repo Go replace
+      # (../hertz-iam/packages/authmw-go) resolves.
+      context: ../../..
+      dockerfile: dreamreader-sync/Dockerfile
+      network: "${HERTZ_BUILD_NETWORK:-host}"
+      args:
+        GOPROXY: "${HERTZ_GOPROXY:-https://goproxy.cn,direct}"
+        HTTP_PROXY: "${HTTP_PROXY:-}"
+        HTTPS_PROXY: "${HTTPS_PROXY:-}"
+        NO_PROXY: "${NO_PROXY:-localhost,127.0.0.1,::1}"
+        http_proxy: "${http_proxy:-}"
+        https_proxy: "${https_proxy:-}"
+        no_proxy: "${no_proxy:-localhost,127.0.0.1,::1}"
+    environment:
+      DREAMSYNC_HTTP_ADDR: ":8090"
+      DREAMSYNC_DB_PATH: "/data/dreamsync.db"
+      # Public IAM issuer; every access token must carry this issuer + the
+      # client_id audience. JWKS is derived from the issuer unless overridden.
+      DREAMSYNC_IAM_ISSUER: "${DREAMSYNC_IAM_ISSUER:?DREAMSYNC_IAM_ISSUER must be set (e.g. https://account.64hz.cn)}"
+      DREAMSYNC_JWKS_URI: "${DREAMSYNC_JWKS_URI:-}"
+      DREAMSYNC_CLIENT_ID: "${DREAMSYNC_CLIENT_ID:-dream_manga_reader}"
+      DREAMSYNC_MAX_DOC_BYTES: "${DREAMSYNC_MAX_DOC_BYTES:-8388608}"
+      # Native app clients send no Origin, so this is normally empty. Set a
+      # comma-separated allowlist only for a browser build.
+      DREAMSYNC_CORS_ORIGINS: "${DREAMSYNC_CORS_ORIGINS:-}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:${DREAMSYNC_HTTP_PORT:-8090}:8090"
+    volumes:
+      # One SQLite file holds every user's sync document; back it up by copying
+      # this volume (or DREAMSYNC_DB_PATH inside it).
+      - dreamsync_data:/data
+    restart: unless-stopped
+    logging: *default-logging
+    cpus: "0.50"
+    mem_limit: 128m
+
+volumes:
+  dreamsync_data:
+
+networks:
+  default:
+    name: dreamreader-sync
