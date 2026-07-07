@@ -1,7 +1,11 @@
 #!/bin/sh
 # dreamreader-sync installer for Debian hosts. Builds and starts the sync service
-# (a single Go + SQLite container) and, unless --no-nginx, renders and enables a
-# host-Nginx site that proxies the public domain to it.
+# (a single Go + SQLite container) on 127.0.0.1:<port>.
+#
+# By DEFAULT it does NOT touch host Nginx — it assumes a panel (宝塔/aaPanel) or
+# your own reverse proxy fronts the service and terminates TLS; just point that
+# proxy at 127.0.0.1:<port> (see deploy/install/README.md). Pass --nginx to also
+# render and enable a host-Nginx site + certbot hint.
 #
 # Identity comes from the IAM platform; deploy that first and register the
 # `dream_manga_reader` client as a public client (authorization_code +
@@ -10,9 +14,9 @@
 # Deploy assets (compose, .env, nginx template) live in deploy/install/.
 #
 # Usage:
-#   sudo ./scripts/install.sh                     # interactive setup + install
+#   sudo ./scripts/install.sh                     # interactive setup + install (panel-managed)
 #   sudo ./scripts/install.sh --setup             # re-run the interactive .env wizard
-#   sudo ./scripts/install.sh --no-nginx          # panel manages TLS (aaPanel/BT)
+#   sudo ./scripts/install.sh --nginx             # ALSO render + enable a host-Nginx site
 #   ./scripts/install.sh --no-build               # restart only (no rebuild)
 #   ./scripts/install.sh --update [--no-pull]     # git pull + rebuild + recreate
 set -eu
@@ -25,7 +29,7 @@ ENV_EXAMPLE="$DEPLOY_DIR/.env.example"
 NGINX_TMPL="$DEPLOY_DIR/nginx-site.conf.tmpl"
 
 DOMAIN=""
-DO_NGINX=y
+DO_NGINX=n          # default: panel/own reverse proxy fronts the service; --nginx opts in
 DO_BUILD=y
 DO_SETUP=n
 UPDATE_MODE=n
@@ -118,6 +122,7 @@ wait_http() {
 while [ $# -gt 0 ]; do
   case "$1" in
     --domain)   DOMAIN="${2:?--domain needs a value}"; shift 2 ;;
+    --nginx)    DO_NGINX=y; shift ;;
     --no-nginx) DO_NGINX=n; shift ;;
     --no-build) DO_BUILD=n; shift ;;
     --setup)    DO_SETUP=y; shift ;;
