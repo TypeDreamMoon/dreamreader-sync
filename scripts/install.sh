@@ -105,7 +105,11 @@ git_update_repo() {
   command -v git >/dev/null 2>&1 || die "git not found; install it or rerun with --no-pull"
   info "current revision: $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)"
   [ -z "$(git -C "$REPO_ROOT" status --porcelain)" ] || die "working tree has local changes; commit/stash or rerun with --no-pull"
-  git -C "$REPO_ROOT" pull --ff-only || die "git pull --ff-only failed"
+  _br="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)"
+  git -C "$REPO_ROOT" fetch --prune origin || die "git fetch failed"
+  # 部署检出应精确跟随远端:硬重置而非 pull --ff-only,这样远端历史被 force-push/
+  # rewrite(如清理提交信息)导致分叉时也能更新(部署检出没有本地提交可丢)。
+  git -C "$REPO_ROOT" reset --hard "origin/$_br" || die "git reset --hard origin/$_br failed"
   ok "updated to $(git -C "$REPO_ROOT" rev-parse --short HEAD)"
 }
 
